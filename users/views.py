@@ -15,9 +15,8 @@ def accounts_login(request):
     The login api
     """
     if request.method == "POST":
-        req = json.loads(request.body)
-        username = req['username']
-        password = req['password']
+        username = request.POST['username']
+        password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             return JsonResponse({
@@ -40,10 +39,9 @@ def accounts_register(request):
     The register api
     """
     if request.method == "POST":
-        req = json.loads(request.body)
-        username = req['username']
-        password = req['password']
-        nickname = req['nickname']
+        username = request.POST['username']
+        password = request.POST['password']
+        nickname = request.POST['nickname']
 
         user = User.objects.filter(username=username)
         if user.exists():
