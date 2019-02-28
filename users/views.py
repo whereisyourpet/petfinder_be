@@ -64,3 +64,25 @@ def accounts_register(request):
             'success': 0,
             'msg': 'Wrong method'
         })
+
+
+def accounts_logout(request):
+    """
+    The logout api
+    """
+    auth.logout(request)
+    return JsonResponse({
+        'success': 1
+    })
+
+
+def status(request):
+    if request.user.is_authenticated:
+        return JsonResponse({
+            'status': 1,
+            'username': request.user.get_username()
+        })
+    else:
+        return JsonResponse({
+            'status': 0
+        })
