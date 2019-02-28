@@ -3,10 +3,32 @@ from django.db import models
 # Create your models here.
 
 class breed:
-    pass
+    # choice of breed
+    BREED_TYPE_CHOICE = (
+        ('Felinae',     '短毛猫'),
+        ('Persian',     '波斯猫'),
+        ('DragonLi',    '狸花猫'),
+    )
+
+    # PK
+    breed_id        = models.IntegerField(max_length=15)
+
+    # others
+    breed_type      = models.CharField(max_length=15, choices=BREED_TYPE_CHOICE)
 
 class color:
-    pass
+    # choice of color
+    COLOR_TYPE_CHOICE = (
+        ('B', 'Blue'),
+        ('R', 'Red'),
+        ('G', 'Green')
+    )
+
+    # PK
+    color_id        = models.IntegerField(max_length=15)
+
+    # others
+    color_type      = models.CharField(max_length=15, choices=COLOR_TYPE_CHOICE)
 
 
 class pet_info(models.Model):
@@ -22,7 +44,7 @@ class pet_info(models.Model):
     # PK and FK
     pet_id          = models.IntegerField(max_length=DEFAULT_MAXLENGTH, primary_key=True)
     breed_id        = models.ForeignKey(breed, on_delete=models.CASCADE)
-    color_id        = models.IntegerField(max_length=DEFAULT_MAXLENGTH)
+    color_id        = models.ForeignKey(color, on_delete=models.CASCADE)
 
     # unknow relationship
     rescuer_id      = models.IntegerField(max_length=DEFAULT_MAXLENGTH)
