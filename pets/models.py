@@ -57,7 +57,7 @@ class pet_info(models.Model):
     )
     # choice of fur length
     FURLENGTH_CHOICE = (
-        ('0','Not Specified')
+        ('0','Not Specified'),
         ('1','Short'),
         ('2','Medium'),
         ('3','Long'),
