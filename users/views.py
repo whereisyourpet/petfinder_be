@@ -19,17 +19,20 @@ def accounts_login(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            auth.login(request, user)
             return JsonResponse({
-                'success': 1
+                'success': 1,
+                'msg': "登陆成功"
             })
         else:
             return JsonResponse({
                 'success': 0,
-                'msg': "failed"
+                'msg': "用户名或密码错误"
             })
     else:
         return JsonResponse({
-            'success': 0
+            'success': 0,
+            'msg': 'Wrong method'
         })
 
 
@@ -47,14 +50,14 @@ def accounts_register(request):
         if user.exists():
             return JsonResponse({
                 'success': 0,
-                'msg': 'repeated'
+                'msg': '用户名重复'
             })
         else:
             User.objects.create_user(
                 username=username, password=password, nickname=nickname)
             return JsonResponse({
                 'success': 1,
-                'msg': 'ojbk'
+                'msg': '注册成功'
             })
     else:
         return JsonResponse({
