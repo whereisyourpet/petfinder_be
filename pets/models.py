@@ -154,7 +154,7 @@ class pet_info(models.Model):
                             verbose_name    = "收养费",)
     state           = models.CharField(
                             max_length      = 200,
-                            verbose_name    = "州位置"，)
+                            verbose_name    = "州位置",)
     video_amt       = models.CharField(
                             max_length      = DEFAULT_MAXLENGTH,
                             verbose_name    = "视频",)
