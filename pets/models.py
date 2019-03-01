@@ -1,41 +1,23 @@
 from django.db import models
 
 # Create your models here.
+class pet_info(models.Model):
+    # constant
+    DEFAULT_MAXLENGTH = 15
 
-class breed:
+    # choices
+    # choice of pet color
+    COLOR_CHOICE    = (
+        ('B', 'Blue'),
+        ('R', 'Red'),
+        ('G', 'Green'),
+    )
     # choice of breed
     BREED_TYPE_CHOICE = (
         ('Felinae',     '短毛猫'),
         ('Persian',     '波斯猫'),
         ('DragonLi',    '狸花猫'),
     )
-
-    # PK
-    breed_id        = models.IntegerField(max_length=15)
-
-    # others
-    breed_type      = models.CharField(max_length=15, choices=BREED_TYPE_CHOICE)
-
-class color:
-    # choice of color
-    COLOR_TYPE_CHOICE = (
-        ('B', 'Blue'),
-        ('R', 'Red'),
-        ('G', 'Green')
-    )
-
-    # PK
-    color_id        = models.IntegerField(max_length=15)
-
-    # others
-    color_type      = models.CharField(max_length=15, choices=COLOR_TYPE_CHOICE)
-
-
-class pet_info(models.Model):
-    # constant
-    DEFAULT_MAXLENGTH = 15
-
-    # choices
     # choice of pet type
     PET_TYPE_CHOICE = (
         ('1','Dog'),
@@ -93,14 +75,18 @@ class pet_info(models.Model):
                             max_length      = DEFAULT_MAXLENGTH, 
                             primary_key     = True,
                             verbose_name    = "宠物ID",)
-    breed_id        = models.ForeignKey(
-                            breed, 
-                            on_delete       = models.CASCADE,
-                            verbose_name    = "血统ID",)
-    color_id        = models.ForeignKey(
-                            color, 
-                            on_delete       = models.CASCADE,
-                            verbose_name    = "颜色ID",)
+   
+    ######
+    ##   FK还需要修改
+    ######
+    # breed_id        = models.ForeignKey(
+    #                         'PetBreed', 
+    #                         on_delete       = models.CASCADE,
+    #                         verbose_name    = "血统ID",)
+    # color_id        = models.ForeignKey(
+    #                         'PetColor', 
+    #                         on_delete       = models.CASCADE,
+    #                         verbose_name    = "颜色ID",)
 
     # unknow relationship
     rescuer_id      = models.IntegerField(
@@ -146,11 +132,13 @@ class pet_info(models.Model):
                             verbose_name    = "是否已消毒",)
     health          = models.CharField(
                             max_length      = 1,
-                            choice          = HEALTH_CHOICE,
+                            choices         = HEALTH_CHOICE,
                             verbose_name    = "健康程度",)
     quantity        = models.IntegerField(
                             max_length=3)
     fee             = models.DecimalField(
+                            max_digits      = 3, 
+                            decimal_places  = 1, 
                             verbose_name    = "收养费",)
     state           = models.CharField(
                             max_length      = 200,
@@ -166,7 +154,53 @@ class pet_info(models.Model):
                             verbose_name    = "描述",)
     adoption_speed  = models.IntegerField(
                             max_length      = 3, 
-                            verbose_name    = "被收养速率",
-                            )
+                            verbose_name    = "被收养速率",)
+    primary_breed   = models.CharField(
+                            max_length      = 200,
+                            choices         = BREED_TYPE_CHOICE,
+                            verbose_name    = "主要血统",)
+    secondary_breed = models.CharField(
+                            max_length      = 200, 
+                            choices         = BREED_TYPE_CHOICE,
+                            verbose_name    = "次要血统",)
+    primary_color   = models.CharField(
+                            max_length      = 10,
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "主要毛色",)
+    secondary_color1= models.CharField(
+                            max_length      = 10,
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "次要毛色1",)
+    secondary_color2= models.CharField(
+                            max_length      = 10,
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "次要毛色2",)
 
-    
+
+# class PetBreed:
+#     # choice of breed
+#     BREED_TYPE_CHOICE = (
+#         ('Felinae',     '短毛猫'),
+#         ('Persian',     '波斯猫'),
+#         ('DragonLi',    '狸花猫'),
+#     )
+
+#     # PK
+#     breed_id        = models.IntegerField(max_length=15,primary_key=True,unique=True)
+
+#     # others
+#     breed_type      = models.CharField(max_length=15, choices=BREED_TYPE_CHOICE)
+
+# class PetColor:
+#     # choice of color
+#     COLOR_TYPE_CHOICE = (
+#         ('B', 'Blue'),
+#         ('R', 'Red'),
+#         ('G', 'Green')
+#     )
+
+#     # PK
+#     color_id        = models.IntegerField(max_length=15,primary_key=True,unique=True)
+
+#     # others
+#     color_type      = models.CharField(max_length=15, choices=COLOR_TYPE_CHOICE)
