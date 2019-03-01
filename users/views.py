@@ -144,6 +144,9 @@ def accounts_modify(request):
 
 
 def get_user_info(request):
+    """
+    Get all user information
+    """
     if request.user.is_authenticated:
         return JsonResponse({
             'success': 1,
