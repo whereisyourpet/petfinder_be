@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+import datetime
 
 # Create your models here.
 class pet_info(models.Model):
@@ -73,10 +75,9 @@ class pet_info(models.Model):
     # PK and FK
     # 如果不使用自动生成的id，则取消如下代码注释
     # see: https://docs.djangoproject.com/en/2.1/topics/db/models/#automatic-primary-key-fields
-    # pet_id          = models.IntegerField(
-    #                         max_length      = DEFAULT_MAXLENGTH, 
-    #                         primary_key     = True,
-    #                         verbose_name    = "宠物ID",)
+    pet_id          = models.AutoField(
+                            primary_key     = True,
+                            verbose_name    = "宠物ID",)
    
     ######
     ##   FK还需要修改

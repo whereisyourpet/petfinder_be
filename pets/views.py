@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate, login, logout
 from .models import pet_info
+from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+
 import json
 
 # Create your views here.
@@ -16,47 +19,11 @@ def get_pet_info(request):
     # 否则返回空
     ##
     if request.user.is_authenticated:
-        # 通过用户id筛选该用户所发布的流浪动物信息，并返回
-        # 这里只是示范
-
-        username = request.user.get_username()              # 获取用户唯一辨识符--用户名
-        # pets = User.objects.filter(username=username)     # 根据用户名筛选符合要求的流浪动物信息
-        return JsonResponse({
-            'success':           1,
-            'pet_name':         '二哈',
-            'pet_type':         '汪汪汪',
-            'pet_gender':       '公',
-            'pet_age':           1,
-            'primary_breed':    'Akita',
-            'secondary_breed':  'Boxer',
-            'primary_color':    '黑色',
-            'secondary_color1': '灰色',
-            'secondary_color2': '白色',
-            'maturity_size':    '九米级究极巨人',
-            'fur_length':       '短毛',
-            '成年体长':          '25',
-            'state':            'Johor',
-            'dewormed':         '是',
-            'sterilized':       '有',
-        })
-        # return JsonResponse({
-        #     'success':           1,
-        #     'pet_name':         pets.pet_name,
-        #     'pet_type':         pets.pet_type,
-        #     'pet_gender':       pets.gender,
-        #     'pet_age':          pets.pet_age,
-        #     'primary_breed':    pets.primary_breed,
-        #     'secondary_breed':  pets.secondary_breed,
-        #     'primary_color':    pets.primary_color,
-        #     'secondary_color1': pets.secondary_color1,
-        #     'secondary_color2': pets.secondary_color2,
-        #     'maturity_size':    pets.maturity_size,
-        #     'fur_length':       pets.fur_length,
-        #     #'成年体长':          unknow data
-        #     'state':            pets.state,
-        #     'dewormed':         pets.dewormed,
-        #     'sterilized':       pets.sterilized,
-        # })
+        username = request.user.get_username()                        # 获取用户唯一辨识符--用户名
+        pets = pet_info.objects.filter(publisher_name=username)       # 根据用户名筛选符合要求的流浪动物信息
+        data = serializers.serialize("json",pets)
+        # return JsonResponse(data, safe=False)
+        return JsonResponse({'data': data})
     else:
         return JsonResponse({
             'success':           0,
