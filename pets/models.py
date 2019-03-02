@@ -71,6 +71,13 @@ class pet_info(models.Model):
         (2,'No'),
         (3,'Not Sure'),
     )
+    # choice of fur length
+    FUR_LENGTH_CHOICE = (
+        (1, 'Short'),
+        (2, 'Medium'),
+        (3, 'Long'),
+        (0, 'Not Specified'),
+    )
 
     # PK and FK
     # 如果不使用自动生成的id，则取消如下代码注释
@@ -103,8 +110,7 @@ class pet_info(models.Model):
                             default         = None,)
 
     # orther infomation
-    pet_type        = models.CharField(
-                            max_length      = 1,
+    pet_type        = models.IntegerField(
                             choices         = PET_TYPE_CHOICE,
                             verbose_name    = "动物类型",
                             default         = None,)
@@ -113,68 +119,60 @@ class pet_info(models.Model):
                             verbose_name    = "动物名称",
                             default         = None,)
     pet_age         = models.IntegerField(
-                            max_length      = 2,
                             verbose_name    = "动物年龄",
                             default         = 0,
                             blank           = True,)
     maturity_size   = models.IntegerField(
-                            max_length      = 1,
                             choices         = MATURITY_SIZE_TYPE,
                             verbose_name    = "动物体型",
                             default         = 0,
                             blank           = True,)
-    gender          = models.CharField(
-                            max_length      = 1, 
+    gender          = models.IntegerField(
                             choices         = GENDER_CHOICE,
                             verbose_name    = "动物性别",
                             default         = '3',)
     fur_length      = models.IntegerField(
-                            max_length      = 5,
+                            choices         = FUR_LENGTH_CHOICE,
                             verbose_name    = "毛长",
                             default         = 0,
                             blank           = True,)
     vaccinated      = models.IntegerField(
-                            max_length      = 1,
                             choices         = VACCINATED_CHOICE,
                             verbose_name    = "是否接受疫苗",
                             default         = 3,)
     dewormed        = models.IntegerField(
-                            max_length      = 1,
                             choices         = DEWORMED_CHOICE,
                             verbose_name    = "是否已除虫",
                             default         = 3,)
     sterilized      = models.IntegerField(
-                            max_length      = 1,
                             choices         = STERILIZED_CHOICE,
                             verbose_name    = "是否已消毒",
                             default         = 3,)
-    health          = models.CharField(
-                            max_length      = 1,
+    health          = models.IntegerField(
                             choices         = HEALTH_CHOICE,
                             verbose_name    = "健康程度",
-                            default         = '3',)
-    quantity        = models.IntegerField(
-                            max_length      = 3,
+                            default         = 3,)
+    quantity        = models.DecimalField(
+                            max_digits      = 5, 
+                            decimal_places  = 2,
                             verbose_name    = "体重",
                             default         = 0,
                             blank           = True,)
     fee             = models.DecimalField(
-                            max_digits      = 3, 
-                            decimal_places  = 1, 
+                            max_digits      = 5, 
+                            decimal_places  = 2, 
                             verbose_name    = "收养费",
-                            default         = None,)
+                            default         = 0,)
     state           = models.CharField(
                             max_length      = 200,
                             verbose_name    = "州位置",
                             default         = 'None',
                             blank           = True,)
-    video_amt       = models.CharField(
-                            max_length      = DEFAULT_MAXLENGTH,
+    video_amt       = models.IntegerField(
                             verbose_name    = "视频",
                             default         = 'None',
                             blank           = True,)
-    photo_amt       = models.CharField(
-                            max_length      = DEFAULT_MAXLENGTH,
+    photo_amt       = models.IntegerField(
                             verbose_name    = "照片",
                             default         = 'None',
                             blank           = True,)
@@ -183,7 +181,6 @@ class pet_info(models.Model):
                             verbose_name    = "描述",
                             default         = "发布者很懒，什么都没有说",)
     adoption_speed  = models.IntegerField(
-                            max_length      = 3, 
                             verbose_name    = "被收养速率",
                             default         = 0,
                             blank           = True,)
@@ -200,18 +197,15 @@ class pet_info(models.Model):
                             blank           = True,)
     primary_color   = models.CharField(
                             max_length      = 10,
-                            choices         = COLOR_CHOICE,
                             verbose_name    = "主要毛色",
                             default         = None,)
     secondary_color1= models.CharField(
                             max_length      = 10,
-                            choices         = COLOR_CHOICE,
                             verbose_name    = "次要毛色1",
                             default         = None,
                             blank           = True,)
     secondary_color2= models.CharField(
                             max_length      = 10,
-                            choices         = COLOR_CHOICE,
                             verbose_name    = "次要毛色2",
                             default         = None,
                             blank           = True,)

@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from .models import pet_info
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.views.decorators.csrf import csrf_exempt
 
 import json
 
@@ -30,6 +31,7 @@ def get_pet_info(request):
         })
 
 
+@csrf_exempt
 def publish_pet_information(request):
     """
     Publish new stray animails
@@ -41,6 +43,7 @@ def publish_pet_information(request):
     if request.user.is_authenticated and request.method == "POST":
         # 提取json信息
         # 判断是否空，若空则为，默认值
+        # 由前端判断
         publisher_name  = request.user.get_username()
         pet_name        = request.POST['pet_name']
         pet_type        = request.POST['pet_type']
@@ -56,13 +59,25 @@ def publish_pet_information(request):
         state           = request.POST['state']
         dewormed        = request.POST['dewormed']
         sterilized      = request.POST['sterilized']
+        vaccinated      = request.POST['vaccinated']
+        health          = request.POST['health']
+        quantity        = request.POST['quantity']
+        fee             = request.POST['fee']
+        video_amt       = request.POST['video_amt']
+        photo_amt       = request.POST['photo_amt']
+        description     = request.POST['description']
         #length          = request.POST['length']
 
-        pets.create_pet(
+        print("\n")
+        print(request.POST)
+        print("\n")
+
+        pet_info.objects.create(
+            rescuer_name    = 'None',
             publisher_name  = publisher_name,
             pet_name        = pet_name,
             pet_type        = pet_type,
-            pet_gender      = pet_gender,
+            gender          = pet_gender,
             pet_age         = pet_age,
             primary_breed   = primary_breed,
             secondary_breed = secondary_breed,
@@ -73,7 +88,14 @@ def publish_pet_information(request):
             fur_length      = fur_length,
             state           = state,
             dewormed        = dewormed,
-            sterilized      = sterilized,)
+            sterilized      = sterilized,
+            vaccinated      = vaccinated,
+            health          = health,
+            quantity        = quantity,
+            fee             = fee,
+            video_amt       = video_amt,
+            photo_amt       = photo_amt,
+            description     = description,)
         return JsonResponse({
             'success': 1,
             'msg': '发布成功'
