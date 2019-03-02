@@ -24,7 +24,10 @@ def get_pet_info(request):
         pets = pet_info.objects.filter(publisher_name=username)       # 根据用户名筛选符合要求的流浪动物信息
         data = serializers.serialize("json",pets)
         # return JsonResponse(data, safe=False)
-        return JsonResponse({'data': data})
+        return JsonResponse({
+            'success':           1,
+            'data':             data,
+        })
     else:
         return JsonResponse({
             'success':           0,
