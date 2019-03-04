@@ -205,4 +205,33 @@ def recommand_pets(request):
     返回的信息有
     动物id      动物名称    易收养指数  受欢迎程度
     """
-    pass
+    if request.user.is_authenticated and request.method == "POST":
+        username        = request.user.get_username()
+        fee             = request.POST['fee'] 
+        pet_type        = request.POST['pet_type']
+        pet_gender      = request.POST['pet_gender']
+        pet_age         = request.POST['pet_age']
+        primary_breed   = request.POST['primary_breed']
+        secondary_breed = request.POST['secondary_breed']
+        primary_color   = request.POST['primary_color']
+        secondary_color1= request.POST['secondary_color1']
+        secondary_color2= request.POST['secondary_color2']
+        maturity_size   = request.POST['maturity_size']
+        fur_length      = request.POST['fur_length']
+        state           = request.POST['state']
+        dewormed        = request.POST['dewormed']
+        # sterilized      = request.POST['sterilized'] # 是否消毒
+        vaccinated      = request.POST['vaccinated']
+
+        ##筛选
+        pets = pet_info.objects.filter(publisher_name=username)       # 根据用户提供的信息筛选符合要求的流浪动物信息
+        data = serializers.serialize("json",pets)
+        return JsonResponse({
+            'success':          1,
+            'data':             data,
+        })
+
+    else:
+        return JsonResponse({
+            'success': 0,
+        })

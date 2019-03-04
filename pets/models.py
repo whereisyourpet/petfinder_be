@@ -170,6 +170,8 @@ class pet_info(models.Model):
                             verbose_name    = "被收养速率",
                             default         = 0,
                             blank           = True,)
+
+    # FK备选区，但是外键问题还没有解决
     primary_breed   = models.CharField(
                             max_length      = 200,
                             choices         = BREED_TYPE_CHOICE,
@@ -195,4 +197,11 @@ class pet_info(models.Model):
                             verbose_name    = "次要毛色2",
                             default         = None,
                             blank           = True,)
-
+    popularity_star = models.IntegerField(
+                            verbose_name    = "受欢迎指数", 
+                            default         = 1,
+                            blank           = False,)
+    adoption_star   = models.IntegerField(
+                            verbose_name    = "易收养指数",
+                            default         = 1,
+                            blank           = False,)    
