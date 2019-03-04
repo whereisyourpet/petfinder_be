@@ -1,4 +1,4 @@
-from django.shortcuts import render
+﻿from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate, login, logout
@@ -108,6 +108,86 @@ def publish_pet_information(request):
             'success': 0,
             'msg': 'Wrong method'
         })
+@csrf_exempt
+def modify(request):
+    """
+    Modify pet information
+    """
+    if request.user.is_authenticated and request.method == "POST":
+        pet = models.pet_info.objects.get(pet_id=request.POST["pet_id"])
+
+        if "pet_name" in request.POST:
+            pet.pet_name = request.POST["pet_name"]
+
+        if "pet_type" in request.POST:
+            pet.pet_type = request.POST["pet_type"]
+
+        if "pet_gender" in request.POST:
+            pet.pet_gender = request.POST["pet_gender"]
+
+        if "pet_age" in request.POST:
+            pet.pet_age = request.POST["pet_age"]
+
+        if "primary_breed" in request.POST:
+            pet.primary_breed = request.POST["primary_breed"]
+
+        if "secondary_breed" in request.POST:
+            pet.secondary_breed = request.POST["secondary_breed"]
+
+        if "primary_color" in request.POST:
+            pet.primary_color = request.POST["primary_color"]
+
+        if "secondary_color1" in request.POST:
+            pet.secondary_color1 = request.POST["secondary_color1"]
+
+        if "secondary_color2" in request.POST:
+            pet.secondary_color2 = request.POST["secondary_color2"]
+
+        if "maturity_size" in request.POST:
+            pet.maturity_size = request.POST["maturity_size"]
+            
+        if "state" in request.POST:
+            pet.state = request.POST["state"]
+
+        if "fur_length" in request.POST:
+            pet.fur_length = request.POST["fur_length"]
+
+        if "dewormed" in request.POST:
+            pet.dewormed = request.POST["dewormed"]   
+
+        if "sterilized" in request.POST:
+            pet.sterilized = request.POST["sterilized"]   
+
+        pet.save()
+        return JsonResponse({
+            'success': 1,
+            'msg': "信息修改成功"
+        })
+
+    else:
+        return JsonResponse({
+            'success': 0,
+            'msg': "信息修改失败"
+        })
+
+def delete(request):
+    """
+    delete  pet information
+    """
+    if request.user.is_authenticated and request.method == "POST":
+        pet = models.pet_info.objects.filter(pet_id=request.POST["pet_id"]).delete()
+        return JsonResponse({
+            'success': 1,
+            'msg': "信息删除成功"
+        })
+
+    else:
+        return JsonResponse({
+            'success': 0,
+            'msg': "信息删除失败"
+        })  
+
+
 
 def recommand_pets(request):
     """
