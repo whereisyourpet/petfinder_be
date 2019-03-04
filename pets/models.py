@@ -86,19 +86,6 @@ class pet_info(models.Model):
                             primary_key     = True,
                             verbose_name    = "宠物ID",)
    
-    ######
-    ##   FK还需要修改
-    ######
-    # breed_id        = models.ForeignKey(
-    #                         'PetBreed', 
-    #                         on_delete       = models.CASCADE,
-    #                         verbose_name    = "血统ID",)
-    # color_id        = models.ForeignKey(
-    #                         'PetColor', 
-    #                         on_delete       = models.CASCADE,
-    #                         verbose_name    = "颜色ID",)
-
-    # unknow relationship
     rescuer_name    = models.CharField(
                             max_length      = 30,
                             verbose_name    = "救助者姓名",
@@ -109,7 +96,6 @@ class pet_info(models.Model):
                             verbose_name    = "发布者姓名",
                             default         = None,)
 
-    # orther infomation
     pet_type        = models.IntegerField(
                             choices         = PET_TYPE_CHOICE,
                             verbose_name    = "动物类型",
@@ -210,63 +196,3 @@ class pet_info(models.Model):
                             default         = None,
                             blank           = True,)
 
-    # def __init__(
-    #     self,
-    #     rescuer_id          = None,
-    #     publisher_name,
-    #     pet_type,
-    #     pet_name,
-    #     pet_age,
-    #     maturity_size,
-    #     gender,
-    #     fur_length,
-    #     vaccinated,
-    #     dewormed,
-    #     sterilized,
-    #     health,
-    #     quantity,
-    #     fee,
-    #     state,
-    #     video_amt,
-    #     photo_amt,
-    #     description,
-    #     adoption_speed,
-    #     primary_breed,
-    #     secondary_breed,
-    #     primary_color,
-    #     secondary_color1,
-    #     secondary_color2,
-    #     ):
-    #     """
-    #     create and save a cat
-    #     """
-    #     pass
-
-
-# class PetBreed:
-#     # choice of breed
-#     BREED_TYPE_CHOICE = (
-#         ('Felinae',     '短毛猫'),
-#         ('Persian',     '波斯猫'),
-#         ('DragonLi',    '狸花猫'),
-#     )
-
-#     # PK
-#     breed_id        = models.IntegerField(max_length=15,primary_key=True,unique=True)
-
-#     # others
-#     breed_type      = models.CharField(max_length=15, choices=BREED_TYPE_CHOICE)
-
-# class PetColor:
-#     # choice of color
-#     COLOR_TYPE_CHOICE = (
-#         ('B', 'Blue'),
-#         ('R', 'Red'),
-#         ('G', 'Green')
-#     )
-
-#     # PK
-#     color_id        = models.IntegerField(max_length=15,primary_key=True,unique=True)
-
-#     # others
-#     color_type      = models.CharField(max_length=15, choices=COLOR_TYPE_CHOICE)
