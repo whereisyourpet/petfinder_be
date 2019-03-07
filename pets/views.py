@@ -6,6 +6,12 @@ from .models import pet_info
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+
+from numpy import *
+import numpy as np
+import operator
+import csv
 
 import json
 
@@ -71,10 +77,6 @@ def publish_pet_information(request):
         description     = request.POST['description']
         #length          = request.POST['length']
 
-        print("\n")
-        print(request.POST)
-        print("\n")
-
         pet_info.objects.create(
             rescuer_name    = 'None',
             publisher_name  = publisher_name,
@@ -108,6 +110,7 @@ def publish_pet_information(request):
             'success': 0,
             'msg': 'Wrong method'
         })
+
 @csrf_exempt
 def modify(request):
     """
@@ -187,9 +190,9 @@ def delete(request):
             'msg': "信息删除失败"
         })  
 
-
-
-def recommand_pets(request):
+# 用户输入喜爱动物的参数，函数返回推荐宠物
+@csrf_exempt
+def get_recommand_pets(request):
     """
     Recommand pets to users
     用户在猜你喜欢上输入期望参数，调用该接口返回推荐的宠物信息
@@ -206,32 +209,81 @@ def recommand_pets(request):
     动物id      动物名称    易收养指数  受欢迎程度
     """
     if request.user.is_authenticated and request.method == "POST":
-        username        = request.user.get_username()
-        fee             = request.POST['fee'] 
-        pet_type        = request.POST['pet_type']
-        pet_gender      = request.POST['pet_gender']
-        pet_age         = request.POST['pet_age']
-        primary_breed   = request.POST['primary_breed']
-        secondary_breed = request.POST['secondary_breed']
-        primary_color   = request.POST['primary_color']
-        secondary_color1= request.POST['secondary_color1']
-        secondary_color2= request.POST['secondary_color2']
-        maturity_size   = request.POST['maturity_size']
-        fur_length      = request.POST['fur_length']
-        state           = request.POST['state']
-        dewormed        = request.POST['dewormed']
-        # sterilized      = request.POST['sterilized'] # 是否消毒
-        vaccinated      = request.POST['vaccinated']
+        publisher_name  = request.user.get_username()
+        pet_type        = int(request.POST['pet_type'])
+        pet_gender      = int(request.POST['pet_gender'])
+        pet_age         = int(request.POST['pet_age'])
+        primary_breed   = int(request.POST['primary_breed'])
+        secondary_breed = int(request.POST['secondary_breed'])
+        primary_color   = int(request.POST['primary_color'])
+        secondary_color1= int(request.POST['secondary_color1'])
+        secondary_color2= int(request.POST['secondary_color2'])
+        maturity_size   = int(request.POST['maturity_size'])
+        fur_length      = int(request.POST['fur_length'])
+        state           = int(request.POST['state'])
+        dewormed        = int(request.POST['dewormed'])
+        sterilized      = int(request.POST['sterilized'])
+        vaccinated      = int(request.POST['vaccinated'])
+        fee             = int(request.POST['fee'])
 
-        ##筛选
-        pets = pet_info.objects.filter(publisher_name=username)       # 根据用户提供的信息筛选符合要求的流浪动物信息
-        data = serializers.serialize("json",pets)
-        return JsonResponse({
-            'success':          1,
-            'data':             data,
+        oralData = array(pet_info.objects.values_list(                              # 获取数据库数据
+            'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
+            'primary_color','secondary_color1','secondary_color2','maturity_size',
+            'fur_length','vaccinated','dewormed','sterilized','fee','state'))
+        labels = oralData[:,0]                                                      # 获取宠物id作为labels
+        dataset= oralData[:,1:]                                                     # 其余项作为数据集
+        userinput = [                                                               # 获取用户数据数据
+            pet_type,pet_age,primary_breed,secondary_breed,pet_gender,
+            primary_color,secondary_color1,secondary_color2,maturity_size,
+            fur_length,vaccinated,dewormed,sterilized,fee,state]
+        #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326]
+
+        k=2                                                                         # 设定需要推荐的宠物数量
+        if k>dataset.shape[0]:                                                      # 获取推荐的宠物的id
+            pets_ID_list = list(labels)                                             
+        else:
+            pets_ID_list = recommand(userinput,dataset,labels,k)
+
+        resultdata=[]                                                               # 通过id获取需要返回的宠物id，宠物名字，易收养程度，受欢迎程度
+        for i in pets_ID_list:
+            resultdata.append(list(pet_info.objects.filter(pet_id=i).values(
+                    'pet_id','pet_name','adoption_star','popularity_star')))
+        return JsonResponse({                                                       # 返回结果
+            'success':           1,
+            'data':              resultdata,
         })
-
     else:
         return JsonResponse({
             'success': 0,
+            'data': ''
         })
+
+# 算法实现
+# 函数将返回距离inX加权欧式距离最近的k个数据项作为推荐值
+def recommand(inX, dataSet, labels, k):
+    # 数据类型转化，转化成mat矩阵后进行一些线性操作
+    inX=mat(inX)
+    dataSet=mat(dataSet)
+    labels=np.array(labels)
+
+    # 加权常数项
+    # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
+    # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1
+    dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1])
+
+    # distances = (Σ(inX-dataSet(i))^2.*dataweight)^0.5
+    dataSetSize = dataSet.shape[0]                  # 获取数据规模，即获取该数据矩阵有多少行
+    diffMat = tile(inX, (dataSetSize,1))-dataSet    # tile(A,(m,n))  将数组A作为元素构造出m行n列的数组  X-Xi
+    sqDiffMat = array(diffMat)**2                   # sqDiffMat = diffMat^2                          (X-Xi)^2
+    
+    dataweight = tile(dataweight,(dataSetSize,1))
+    weightedsqDiffMat = np.multiply(sqDiffMat,dataweight)
+
+    sqDistances = weightedsqDiffMat.sum(axis=1)     # array.sum(axis=1)按行累加，axis=0为按列累加      Σ(X-Xi)^2
+    distances = array(sqDistances)**0.5             # distances = sqDistances^0.5                    
+    sortedDistIndicies = distances.T.argsort().T    # array.argsort()，得到每个元素的排序序号
+    
+    recommandResult = []
+    for i in range(k):
+        recommandResult.append(labels[sortedDistIndicies[i][0]])
+    return recommandResult

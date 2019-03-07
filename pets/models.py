@@ -10,20 +10,26 @@ class pet_info(models.Model):
     # choices
     # choice of pet color
     COLOR_CHOICE    = (
-        ('B', 'Blue'),
-        ('R', 'Red'),
-        ('G', 'Green'),
+        (0, 'None'),
+        (1, 'Black'),
+        (2, 'Brown'),
+        (3, 'Golden'),
+        (4, 'Yellow'),
+        (5, 'Cream'),
+        (6, 'Gray'),
+        (7, 'White'),
     )
     # choice of breed
     BREED_TYPE_CHOICE = (
-        ('Felinae',     '短毛猫'),
-        ('Persian',     '波斯猫'),
-        ('DragonLi',    '狸花猫'),
+        (0,     'None'),
+        (1,     'Affenpinscher'),
+        (2,     'Afghan Hound'),
+        (3,    'Airedale Terrier'),
     )
     # choice of pet type
     PET_TYPE_CHOICE = (
-        ('1','Dog'),
-        ('2','Cat'),
+        (1,'Dog'),
+        (2,'Cat'),
     )
     # choice of MaturitySize 
     MATURITY_SIZE_TYPE = (
@@ -35,23 +41,23 @@ class pet_info(models.Model):
     )
     # choice of gender
     GENDER_CHOICE = (
-        ('1','Male'),
-        ('2','Female'),
-        ('3','Mixed, if profile represents group of pets'),
+        (1,'Male'),
+        (2,'Female'),
+        (3,'Mixed, if profile represents group of pets'),
     )
     # choice of fur length
     FURLENGTH_CHOICE = (
-        ('0','Not Specified'),
-        ('1','Short'),
-        ('2','Medium'),
-        ('3','Long'),
+        (0,'Not Specified'),
+        (1,'Short'),
+        (2,'Medium'),
+        (3,'Long'),
     )
     # choice of health
     HEALTH_CHOICE = (
-        ('0','Not Specified'),
-        ('1','Healthy'),
-        ('2','Minor Injury'),
-        ('3','Serious Injury'),
+        (0,'Not Specified'),
+        (1,'Healthy'),
+        (2,'Minor Injury'),
+        (3,'Serious Injury'),
     )
     # choide of Sterilized
     STERILIZED_CHOICE = (
@@ -98,8 +104,7 @@ class pet_info(models.Model):
 
     pet_type        = models.IntegerField(
                             choices         = PET_TYPE_CHOICE,
-                            verbose_name    = "动物类型",
-                            default         = None,)
+                            verbose_name    = "动物类型",)
     pet_name        = models.CharField(
                             max_length      = 50,
                             verbose_name    = "动物名称",
@@ -116,7 +121,7 @@ class pet_info(models.Model):
     gender          = models.IntegerField(
                             choices         = GENDER_CHOICE,
                             verbose_name    = "动物性别",
-                            default         = '3',)
+                            default         = 3,)
     fur_length      = models.IntegerField(
                             choices         = FUR_LENGTH_CHOICE,
                             verbose_name    = "毛长",
@@ -137,31 +142,24 @@ class pet_info(models.Model):
     health          = models.IntegerField(
                             choices         = HEALTH_CHOICE,
                             verbose_name    = "健康程度",
-                            default         = 3,)
-    quantity        = models.DecimalField(
-                            max_digits      = 5, 
-                            decimal_places  = 2,
+                            default         = 0,)
+    quantity        = models.IntegerField(
                             verbose_name    = "体重",
                             default         = 0,
                             blank           = True,)
-    fee             = models.DecimalField(
-                            max_digits      = 5, 
-                            decimal_places  = 2, 
+    fee             = models.IntegerField(
                             verbose_name    = "收养费",
                             default         = 0,)
-    state           = models.CharField(
-                            max_length      = 200,
+    state           = models.IntegerField(
                             verbose_name    = "州位置",
-                            default         = 'None',
+                            default         = 41326,
                             blank           = True,)
     video_amt       = models.IntegerField(
                             verbose_name    = "视频",
-                            default         = 'None',
-                            blank           = True,)
+                            default         = 0,)
     photo_amt       = models.IntegerField(
                             verbose_name    = "照片",
-                            default         = 'None',
-                            blank           = True,)
+                            default         = 0,)
     description     = models.CharField(
                             max_length      = 500,
                             verbose_name    = "描述",
@@ -170,33 +168,6 @@ class pet_info(models.Model):
                             verbose_name    = "被收养速率",
                             default         = 0,
                             blank           = True,)
-
-    # FK备选区，但是外键问题还没有解决
-    primary_breed   = models.CharField(
-                            max_length      = 200,
-                            choices         = BREED_TYPE_CHOICE,
-                            verbose_name    = "主要血统",
-                            default         = 'None',)
-    secondary_breed = models.CharField(
-                            max_length      = 200, 
-                            choices         = BREED_TYPE_CHOICE,
-                            verbose_name    = "次要血统",
-                            default         = None,
-                            blank           = True,)
-    primary_color   = models.CharField(
-                            max_length      = 10,
-                            verbose_name    = "主要毛色",
-                            default         = None,)
-    secondary_color1= models.CharField(
-                            max_length      = 10,
-                            verbose_name    = "次要毛色1",
-                            default         = None,
-                            blank           = True,)
-    secondary_color2= models.CharField(
-                            max_length      = 10,
-                            verbose_name    = "次要毛色2",
-                            default         = None,
-                            blank           = True,)
     popularity_star = models.IntegerField(
                             verbose_name    = "受欢迎指数", 
                             default         = 1,
@@ -204,4 +175,26 @@ class pet_info(models.Model):
     adoption_star   = models.IntegerField(
                             verbose_name    = "易收养指数",
                             default         = 1,
-                            blank           = False,)    
+                            blank           = False,) 
+
+    # FK备选区，但是外键问题还没有解决
+    primary_breed   = models.IntegerField(
+                            choices         = BREED_TYPE_CHOICE,
+                            verbose_name    = "主要血统",
+                            default         = 0,)
+    secondary_breed = models.IntegerField(
+                            choices         = BREED_TYPE_CHOICE,
+                            verbose_name    = "次要血统",
+                            default         = 0,)
+    primary_color   = models.IntegerField(
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "主要毛色",
+                            default         = 0,)
+    secondary_color1= models.IntegerField(
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "次要毛色1",
+                            default         = 0,)
+    secondary_color2= models.IntegerField(
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "次要毛色2",
+                            default         = 0,)   
