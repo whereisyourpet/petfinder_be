@@ -3,7 +3,38 @@ from django.utils import timezone
 import datetime
 
 # Create your models here.
-class pet_info(models.Model):
+# class color(models.Model):
+#     color_id          = models.AutoField(
+#                         primary_key     = True,
+#                         verbose_name    = "颜色ID",)
+#     color_name        = models.CharField(
+#                         max_length      = 30,
+#                         verbose_name    = "颜色名称",
+#                         default         = "",)
+
+# class breed(models.Model):
+#     breed_id          = models.AutoField(
+#                         primary_key     = True,
+#                         verbose_name    = "血统ID",)
+#     breed_type        = models.IntegerField(
+#                         verbose_name    = "血统类型",
+#                         default         = 0,)
+#     breed_name        = models.CharField(
+#                         max_length      = 30,
+#                         verbose_name    = "血统名称",
+#                         default         = "",)
+
+class state(models.Model):
+    state_id          = models.AutoField(
+                        primary_key     = True,
+                        verbose_name    = "州ID",)
+    state_name        = models.CharField(
+                        max_length      = 30,
+                        verbose_name    = "州名称",
+                        default         = "",)
+
+
+class pet(models.Model):
     # constant
     DEFAULT_MAXLENGTH = 15
 
@@ -85,13 +116,35 @@ class pet_info(models.Model):
         (0, 'Not Specified'),
     )
 
-    # PK and FK
+    # PK
     # 如果不使用自动生成的id，则取消如下代码注释
     # see: https://docs.djangoproject.com/en/2.1/topics/db/models/#automatic-primary-key-fields
     pet_id          = models.AutoField(
                             primary_key     = True,
                             verbose_name    = "宠物ID",)
-   
+    # FK备选区，但是外键问题还没有解决
+    state           = models.ForeignKey(state,on_delete=models.CASCADE,verbose_name="州位置",)
+    primary_breed   = models.IntegerField(
+                            choices         = BREED_TYPE_CHOICE,
+                            verbose_name    = "主要血统",
+                            default         = 0,)
+    secondary_breed = models.IntegerField(
+                            choices         = BREED_TYPE_CHOICE,
+                            verbose_name    = "次要血统",
+                            default         = 0,)
+    primary_color   = models.IntegerField(
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "主要毛色",
+                            default         = 0,)
+    secondary_color1= models.IntegerField(
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "次要毛色1",
+                            default         = 0,)
+    secondary_color2= models.IntegerField(
+                            choices         = COLOR_CHOICE,
+                            verbose_name    = "次要毛色2",
+                            default         = 0,)   
+    # 其它属性
     rescuer_name    = models.CharField(
                             max_length      = 30,
                             verbose_name    = "救助者姓名",
@@ -150,10 +203,6 @@ class pet_info(models.Model):
     fee             = models.IntegerField(
                             verbose_name    = "收养费",
                             default         = 0,)
-    state           = models.IntegerField(
-                            verbose_name    = "州位置",
-                            default         = 41326,
-                            blank           = True,)
     video_amt       = models.IntegerField(
                             verbose_name    = "视频",
                             default         = 0,)
@@ -176,25 +225,3 @@ class pet_info(models.Model):
                             verbose_name    = "易收养指数",
                             default         = 1,
                             blank           = False,) 
-
-    # FK备选区，但是外键问题还没有解决
-    primary_breed   = models.IntegerField(
-                            choices         = BREED_TYPE_CHOICE,
-                            verbose_name    = "主要血统",
-                            default         = 0,)
-    secondary_breed = models.IntegerField(
-                            choices         = BREED_TYPE_CHOICE,
-                            verbose_name    = "次要血统",
-                            default         = 0,)
-    primary_color   = models.IntegerField(
-                            choices         = COLOR_CHOICE,
-                            verbose_name    = "主要毛色",
-                            default         = 0,)
-    secondary_color1= models.IntegerField(
-                            choices         = COLOR_CHOICE,
-                            verbose_name    = "次要毛色1",
-                            default         = 0,)
-    secondary_color2= models.IntegerField(
-                            choices         = COLOR_CHOICE,
-                            verbose_name    = "次要毛色2",
-                            default         = 0,)   

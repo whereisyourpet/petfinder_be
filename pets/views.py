@@ -2,7 +2,7 @@
 from django.http import JsonResponse
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate, login, logout
-from .models import pet_info
+from .models import pet
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.csrf import csrf_exempt
@@ -27,7 +27,7 @@ def get_pet_info(request):
     ##
     if request.user.is_authenticated:
         username = request.user.get_username()                        # 获取用户唯一辨识符--用户名
-        pets = pet_info.objects.filter(publisher_name=username)       # 根据用户名筛选符合要求的流浪动物信息
+        pets = pet.objects.filter(publisher_name=username)       # 根据用户名筛选符合要求的流浪动物信息
         data = serializers.serialize("json",pets)
         # return JsonResponse(data, safe=False)
         return JsonResponse({
@@ -77,7 +77,7 @@ def publish_pet_information(request):
         description     = request.POST['description']
         #length          = request.POST['length']
 
-        pet_info.objects.create(
+        pet.objects.create(
             rescuer_name    = 'None',
             publisher_name  = publisher_name,
             pet_name        = pet_name,
@@ -117,7 +117,7 @@ def modify(request):
     Modify pet information
     """
     if request.user.is_authenticated and request.method == "POST":
-        pet = models.pet_info.objects.get(pet_id=request.POST["pet_id"])
+        pet = models.pet.objects.get(pet_id=request.POST["pet_id"])
 
         if "pet_name" in request.POST:
             pet.pet_name = request.POST["pet_name"]
@@ -178,7 +178,7 @@ def delete(request):
     delete  pet information
     """
     if request.user.is_authenticated and request.method == "POST":
-        pet = models.pet_info.objects.filter(pet_id=request.POST["pet_id"]).delete()
+        pet = models.pet.objects.filter(pet_id=request.POST["pet_id"]).delete()
         return JsonResponse({
             'success': 1,
             'msg': "信息删除成功"
@@ -226,7 +226,7 @@ def get_recommand_pets(request):
         vaccinated      = int(request.POST['vaccinated'])
         fee             = int(request.POST['fee'])
 
-        oralData = array(pet_info.objects.values_list(                              # 获取数据库数据
+        oralData = array(pet.objects.values_list(                              # 获取数据库数据
             'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
             'primary_color','secondary_color1','secondary_color2','maturity_size',
             'fur_length','vaccinated','dewormed','sterilized','fee','state'))
@@ -246,7 +246,7 @@ def get_recommand_pets(request):
 
         resultdata=[]                                                               # 通过id获取需要返回的宠物id，宠物名字，易收养程度，受欢迎程度
         for i in pets_ID_list:
-            resultdata.append(list(pet_info.objects.filter(pet_id=i).values(
+            resultdata.append(list(pet.objects.filter(pet_id=i).values(
                     'pet_id','pet_name','adoption_star','popularity_star')))
         return JsonResponse({                                                       # 返回结果
             'success':           1,
