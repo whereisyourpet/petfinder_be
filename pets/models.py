@@ -190,7 +190,7 @@ class pet(models.Model):
                             default         = 3,)
     sterilized      = models.IntegerField(
                             choices         = STERILIZED_CHOICE,
-                            verbose_name    = "是否已消毒",
+                            verbose_name    = "是否已绝育",
                             default         = 3,)
     health          = models.IntegerField(
                             choices         = HEALTH_CHOICE,
