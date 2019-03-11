@@ -22,6 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'n4rtg&o=6(au*t(@^p8x&vc*^_ytkv&u252#xt#o4z=9gj^-=w'
 
+# Set mode
+MODE = "PRODUCT"
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -81,12 +85,46 @@ WSGI_APPLICATION = 'petfinder.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+
+DATABASES_TEST = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'petfinder',
+        'USER': 'root',
+        'PASSWORD': 'lapa**mysql',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
+
+DATABASES_PRODUCT = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'petfinder',
+        'USER': 'root',
+        'PASSWORD': 'petfinder**',
+        'HOST': '127.0.0.1',
+        'PORT': '3306'
+    }
+}
+
+# 处理DB配置
+if MODE == "TEST":
+    # 数据库设置
+    DATABASES = DATABASES_TEST
+elif MODE == "PRODUCT":
+    # 数据库设置
+    DATABASES = DATABASES_PRODUCT
 
 
 # Password validation
