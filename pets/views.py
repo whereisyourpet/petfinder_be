@@ -202,7 +202,7 @@ def get_recommand_pets(request):
     领养费用    类别        性别       年龄
     主要血统    次要血统    主要毛色    次要毛色1&2
     体型        毛长       所在州      是否绝育
-    是否除虫    有无疫苗 
+    是否除虫    有无疫苗    健康程度
 
     返回k只推荐的宠物
     返回的信息有
@@ -225,18 +225,19 @@ def get_recommand_pets(request):
         sterilized      = int(request.POST['sterilized'])
         vaccinated      = int(request.POST['vaccinated'])
         fee             = int(request.POST['fee'])
+        health          = int(request.POST['health'])
 
-        oralData = array(pet.objects.values_list(                              # 获取数据库数据
+        oralData = array(pet.objects.values_list(                                   # 获取数据库数据
             'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
             'primary_color','secondary_color1','secondary_color2','maturity_size',
-            'fur_length','vaccinated','dewormed','sterilized','fee','state'))
+            'fur_length','vaccinated','dewormed','sterilized','fee','state','health'))
         labels = oralData[:,0]                                                      # 获取宠物id作为labels
         dataset= oralData[:,1:]                                                     # 其余项作为数据集
         userinput = [                                                               # 获取用户数据数据
             pet_type,pet_age,primary_breed,secondary_breed,pet_gender,
             primary_color,secondary_color1,secondary_color2,maturity_size,
-            fur_length,vaccinated,dewormed,sterilized,fee,state]
-        #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326]
+            fur_length,vaccinated,dewormed,sterilized,fee,state,health]
+        #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326,3]
 
         k=2                                                                         # 设定需要推荐的宠物数量
         if k>dataset.shape[0]:                                                      # 获取推荐的宠物的id
@@ -268,8 +269,8 @@ def recommand(inX, dataSet, labels, k):
 
     # 加权常数项
     # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
-    # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1
-    dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1])
+    # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1 health*10
+    dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1,10])
 
     # distances = (Σ(inX-dataSet(i))^2.*dataweight)^0.5
     dataSetSize = dataSet.shape[0]                  # 获取数据规模，即获取该数据矩阵有多少行
