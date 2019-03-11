@@ -148,12 +148,12 @@ class pet(models.Model):
         default=0,)
     # 其它属性
     rescuer_name = models.CharField(
-        max_length=30,
+        max_length=50,
         verbose_name="救助者姓名",
         default=None,
         blank=True,)
     publisher_name = models.CharField(
-        max_length=30,
+        max_length=50,
         verbose_name="发布者姓名",
         default=None,)
 
