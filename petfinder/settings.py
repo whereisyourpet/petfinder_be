@@ -114,7 +114,7 @@ DATABASES_PRODUCT = {
         'NAME': 'petfinder',
         'USER': 'root',
         'PASSWORD': 'petfinder**',
-        'HOST': '127.0.0.1',
+        'HOST': '120.79.39.211',
         'PORT': '3306'
     }
 }
