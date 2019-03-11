@@ -3,3 +3,5 @@ django-cors-headers==2.4.0
 django-rest-swagger==2.2.0
 djangorestframework==3.9.1
 numpy==1.16.2
+pymysql==0.9.3
+mysqlclient==1.4.2
