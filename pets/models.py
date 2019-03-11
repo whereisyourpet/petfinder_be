@@ -120,7 +120,8 @@ class pet(models.Model):
     # PK
     # 如果不使用自动生成的id，则取消如下代码注释
     # see: https://docs.djangoproject.com/en/2.1/topics/db/models/#automatic-primary-key-fields
-    pet_id = models.AutoField(
+    pet_id = models.CharField(
+        max_length=50,
         primary_key=True,
         verbose_name="宠物ID",)
     # FK备选区，但是外键问题还没有解决

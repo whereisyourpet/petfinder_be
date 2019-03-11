@@ -14,12 +14,12 @@ import operator
 import csv
 
 import json
+import uuid
 
 # Create your views here.
 def get_pet_info(request):
     """
-    Get all pet's information
-    用户点击数据展示调用该接口，返回显示数据
+    用户登陆后才可调用该请求，返回该用户已发布的宠物id列表
     """
     ##
     # 需要用户登陆后才能进行观看
@@ -27,7 +27,7 @@ def get_pet_info(request):
     ##
     if request.user.is_authenticated:
         username = request.user.get_username()                        # 获取用户唯一辨识符--用户名
-        pets = pet.objects.filter(publisher_name=username)       # 根据用户名筛选符合要求的流浪动物信息
+        pets = pet.objects.filter(publisher_name=username).values('pet_id') # 根据用户名筛选符合要求的流浪动物信息
         data = serializers.serialize("json",pets)
         # return JsonResponse(data, safe=False)
         return JsonResponse({
@@ -53,6 +53,7 @@ def publish_pet_information(request):
         # 提取json信息
         # 判断是否空，若空则为，默认值
         # 由前端判断
+        pet_id          = str(uuid.uuid1()).replace("-","")
         publisher_name  = request.user.get_username()
         pet_name        = request.POST['pet_name']
         pet_type        = request.POST['pet_type']
@@ -79,6 +80,7 @@ def publish_pet_information(request):
 
         pet.objects.create(
             rescuer_name    = 'None',
+            pet_id          = pet_id,
             publisher_name  = publisher_name,
             pet_name        = pet_name,
             pet_type        = pet_type,
@@ -204,7 +206,7 @@ def get_recommand_pets(request):
     体型        毛长       所在州      是否绝育
     是否除虫    有无疫苗    健康程度
 
-    返回k只推荐的宠物
+    返回k只推荐的宠物，调用时需指明
     返回的信息有
     动物id      动物名称    易收养指数  受欢迎程度
     """
@@ -226,6 +228,7 @@ def get_recommand_pets(request):
         vaccinated      = int(request.POST['vaccinated'])
         fee             = int(request.POST['fee'])
         health          = int(request.POST['health'])
+        k               = int(request.POST['k'])
 
         oralData = array(pet.objects.values_list(                                   # 获取数据库数据
             'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
@@ -239,7 +242,7 @@ def get_recommand_pets(request):
             fur_length,vaccinated,dewormed,sterilized,fee,state,health]
         #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326,3]
 
-        k=2                                                                         # 设定需要推荐的宠物数量
+        #k=5                                                                        # 设定需要推荐的宠物数量，或者从端口调用
         if k>dataset.shape[0]:                                                      # 获取推荐的宠物的id
             pets_ID_list = list(labels)                                             
         else:
@@ -288,3 +291,9 @@ def recommand(inX, dataSet, labels, k):
     for i in range(k):
         recommandResult.append(labels[sortedDistIndicies[i][0]])
     return recommandResult
+
+def petfilter(request):
+    pass
+
+def pets_of_user(request):
+    pass
