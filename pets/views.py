@@ -382,15 +382,14 @@ def petfilter(request):
 @csrf_exempt
 def get_pet_info_from_id(request):
     if request.user.is_authenticated and request.method == "POST":
-        pets = pet.objects.filter(pet_id=request.POST['pet_id']).values(
+        data = list(pet.objects.filter(pet_id=request.POST['pet_id']).values(
             'pet_id','state','primary_breed','secondary_breed',
             'primary_color','secondary_color1','secondary_color2',
             'rescuer_name','publisher_name','pet_type','pet_name',
             'pet_age','maturity_size','gender','fur_length',
             'vaccinated','dewormed','sterilized','health',
             'quantity','fee','video_amt','photo_amt','description',
-            'adoption_speed','popularity_star','adoption_star')
-        data = serializers.serialize("json",pets)
+            'adoption_speed','popularity_star','adoption_star'))
         # return JsonResponse(data, safe=False)
         return JsonResponse({
             'success':           1,
