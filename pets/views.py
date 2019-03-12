@@ -85,12 +85,9 @@ def publish_pet_information(request):
         # 设置默认值
 
         if(len(receive_state_id)!=0):
-            print(111)
             state = STATEOBJECT.objects.filter(state_id=int(receive_state_id))
         else:
-            print(222)
-            state = STATEOBJECT.objects.filter(state_id=1)
-        print(state)
+            state = STATEOBJECT.objects.filter(state_id=41336)
         pet.objects.create(
             rescuer_name    = 'None',
             pet_id          = pet_id,
