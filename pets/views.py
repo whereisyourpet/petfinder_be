@@ -298,7 +298,7 @@ def str_to_int(tmpstr):
 def recommand(inX, dataSet, labels, k, dataweight):
     # 数据类型转化，转化成mat矩阵后进行一些线性操作
     inX=mat(inX)
-    dataSet=mat(dataSet)
+    dataSet=mat(matrix_str_to_int(dataSet))
     labels=np.array(labels)
 
     # distances = (Σ(inX-dataSet(i))^2.*dataweight)^0.5
@@ -317,6 +317,18 @@ def recommand(inX, dataSet, labels, k, dataweight):
     for i in range(k):
         recommandResult.append(labels[sortedDistIndicies[i][0]])
     return recommandResult
+
+def matrix_str_to_int(tmpmatrix):
+    width = tmpmatrix.shape[0]
+    height = tmpmatrix.shape[1]
+    newmatrix = np.zeros((width,height))
+
+    for a in range(width):
+        for b in range(height):
+            newmatrix[a,b] = int(tmpmatrix[a,b])
+
+    return newmatrix
+
 
 def petfilter(request):
     if request.user.is_authenticated and request.method == "POST":
@@ -367,10 +379,10 @@ def petfilter(request):
             'data': ''
         })
 
-def get_pet_info_from_id(requets):
-    if request.user.is_authenticated and request.method == "POST"::
-        pet_id = request.POST['pet_id']
-        pets = pet.objects.filter(pet_id=pet_id).values(
+@csrf_exempt
+def get_pet_info_from_id(request):
+    if request.user.is_authenticated and request.method == "POST":
+        pets = pet.objects.filter(pet_id=request.POST['pet_id']).values(
             'pet_id','state','primary_breed','secondary_breed',
             'primary_color','secondary_color1','secondary_color2',
             'rescuer_name','publisher_name','pet_type','pet_name',
