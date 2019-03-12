@@ -28,8 +28,7 @@ def get_pets_of_user(request):
     ##
     if request.user.is_authenticated:
         username = request.user.get_username()                        # 获取用户唯一辨识符--用户名
-        pets = pet.objects.filter(publisher_name=username).values('pet_id') # 根据用户名筛选符合要求的流浪动物信息
-        data = serializers.serialize("json",pets)
+        data = list(pet.objects.filter(publisher_name=username).values('pet_id')) # 根据用户名筛选符合要求的流浪动物信息
         # return JsonResponse(data, safe=False)
         return JsonResponse({
             'success':           1,
@@ -329,10 +328,9 @@ def matrix_str_to_int(tmpmatrix):
 
     return newmatrix
 
-
+@csrf_exempt
 def petfilter(request):
     if request.user.is_authenticated and request.method == "POST":
-        publisher_name  = request.user.get_username()
         pet_type        = int(request.POST['pet_type'])
         pet_gender      = int(request.POST['pet_gender'])
         primary_color   = int(request.POST['primary_color'])
@@ -349,24 +347,24 @@ def petfilter(request):
                 pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
                 secondary_color1=secondary_color2,
                 state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
         elif(secondary_color1!=0 and secondary_color2==0):
             pets = pet.objects.filter(
                 pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
                 secondary_color1=secondary_color1,
                 state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
         elif(secondary_color1==0 and secondary_color2==0):
             pets = pet.objects.filter(
                 pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
                 state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
         else:
             pets = pet.objects.filter(
                 pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
                 secondary_color1=secondary_color1,secondary_color2=secondary_color2,
                 state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
         data = serializers.serialize("json",pets)
 
         return JsonResponse({                                                       # 返回结果
@@ -391,11 +389,18 @@ def get_pet_info_from_id(request):
             'quantity','fee','video_amt','photo_amt','description',
             'adoption_speed','popularity_star','adoption_star'))
         # return JsonResponse(data, safe=False)
-        return JsonResponse({
-            'success':           1,
-            'data':             data,
-        })
+        if(len(data)!=0):
+            return JsonResponse({
+                'success':           1,
+                'data':             data,
+            })
+        else:
+            return JsonResponse({
+                'success':           0,
+                'data':             "incorrect pet id",
+            })
     else:
         return JsonResponse({
             'success':           0,
+            'data':             "wrong method",
         })
