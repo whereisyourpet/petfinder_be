@@ -206,29 +206,29 @@ def get_recommand_pets(request):
     体型        毛长       所在州      是否绝育
     是否除虫    有无疫苗    健康程度
 
-    返回k只推荐的宠物，调用时需指明
+    返回k只推荐的宠物，调用时需指明k
     返回的信息有
     动物id      动物名称    易收养指数  受欢迎程度
     """
     if request.user.is_authenticated and request.method == "POST":
         publisher_name  = request.user.get_username()
-        pet_type        = int(request.POST['pet_type'])
-        pet_gender      = int(request.POST['pet_gender'])
-        pet_age         = int(request.POST['pet_age'])
-        primary_breed   = int(request.POST['primary_breed'])
-        secondary_breed = int(request.POST['secondary_breed'])
-        primary_color   = int(request.POST['primary_color'])
-        secondary_color1= int(request.POST['secondary_color1'])
-        secondary_color2= int(request.POST['secondary_color2'])
-        maturity_size   = int(request.POST['maturity_size'])
-        fur_length      = int(request.POST['fur_length'])
-        state           = int(request.POST['state'])
-        dewormed        = int(request.POST['dewormed'])
-        sterilized      = int(request.POST['sterilized'])
-        vaccinated      = int(request.POST['vaccinated'])
-        fee             = int(request.POST['fee'])
-        health          = int(request.POST['health'])
-        k               = int(request.POST['k'])
+        pet_type,w_pet_type       = str_to_int(request.POST['pet_type'])
+        pet_gender,w_pet_gender      = str_to_int(request.POST['pet_gender'])
+        pet_age,w_pet_age         = str_to_int(request.POST['pet_age'])
+        primary_breed,w_primary_breed   = str_to_int(request.POST['primary_breed'])
+        secondary_breed,w_secondary_breed = str_to_int(request.POST['secondary_breed'])
+        primary_color,w_primary_color   = str_to_int(request.POST['primary_color'])
+        secondary_color1,w_secondary_color1= str_to_int(request.POST['secondary_color1'])
+        secondary_color2,w_secondary_color2= str_to_int(request.POST['secondary_color2'])
+        maturity_size,w_maturity_size   = str_to_int(request.POST['maturity_size'])
+        fur_length,w_fur_length      = str_to_int(request.POST['fur_length'])
+        state,w_state           = str_to_int(request.POST['state'])
+        dewormed,w_dewormed        = str_to_int(request.POST['dewormed'])
+        sterilized,w_sterilized      = str_to_int(request.POST['sterilized'])
+        vaccinated,w_vaccinated     = str_to_int(request.POST['vaccinated'])
+        fee,w_fee             = str_to_int(request.POST['fee'])
+        health,w_health          = str_to_int(request.POST['health'])
+        k,w_k               = str_to_int(request.POST['k'])
 
         oralData = array(pet.objects.values_list(                                   # 获取数据库数据
             'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
@@ -242,11 +242,21 @@ def get_recommand_pets(request):
             fur_length,vaccinated,dewormed,sterilized,fee,state,health]
         #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326,3]
 
-        #k=5                                                                        # 设定需要推荐的宠物数量，或者从端口调用
+        if(w_k==0):
+            k = 5                                                                   # 设定需要推荐的宠物数量
+        # 加权常数项
+        # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
+        # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1 health*10
+        dataweight = mat(
+            [10*w_pet_type,         2*w_pet_age,            2*w_primary_breed,
+            2*w_secondary_breed,    10*w_pet_gender,        2*w_primary_color,
+            2*w_secondary_color1,   2*w_secondary_color2,   2*w_maturity_size,
+            2*w_fur_length,         10*w_vaccinated,        10*w_dewormed,
+            10*w_sterilized,        2*w_fee,                1*w_state,          10*w_health])
         if k>dataset.shape[0]:                                                      # 获取推荐的宠物的id
             pets_ID_list = list(labels)                                             
         else:
-            pets_ID_list = recommand(userinput,dataset,labels,k)
+            pets_ID_list = recommand(userinput,dataset,labels,k,dataweight)
 
         resultdata=[]                                                               # 通过id获取需要返回的宠物id，宠物名字，易收养程度，受欢迎程度
         for i in pets_ID_list:
@@ -262,18 +272,22 @@ def get_recommand_pets(request):
             'data': ''
         })
 
+def str_to_int(tmpstr):
+    if(len(tmpstr)==0):
+        tmpstr = int(1)
+        notempty = 0
+    else:
+        tmpstr = int(tmpstr)
+        notempty = 1
+    return tmpstr,notempty
+
 # 算法实现
 # 函数将返回距离inX加权欧式距离最近的k个数据项作为推荐值
-def recommand(inX, dataSet, labels, k):
+def recommand(inX, dataSet, labels, k, dataweight):
     # 数据类型转化，转化成mat矩阵后进行一些线性操作
     inX=mat(inX)
     dataSet=mat(dataSet)
     labels=np.array(labels)
-
-    # 加权常数项
-    # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
-    # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1 health*10
-    dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1,10])
 
     # distances = (Σ(inX-dataSet(i))^2.*dataweight)^0.5
     dataSetSize = dataSet.shape[0]                  # 获取数据规模，即获取该数据矩阵有多少行
@@ -293,7 +307,24 @@ def recommand(inX, dataSet, labels, k):
     return recommandResult
 
 def petfilter(request):
-    pass
+    if request.user.is_authenticated and request.method == "POST":
+        publisher_name  = request.user.get_username()
+        pet_type        = int(request.POST['pet_type'])
+        pet_gender      = int(request.POST['pet_gender'])
+        primary_color   = int(request.POST['primary_color'])
+        secondary_color1= int(request.POST['secondary_color1'])
+        secondary_color2= int(request.POST['secondary_color2'])
+        state           = int(request.POST['state'])
+        upfee           = int(request.POST['upfee'])
+        downfee         = int(request.POST['downfee'])
+        quantity        = int(request.POST['quantity'])
 
-def pets_of_user(request):
-    pass
+        return JsonResponse({                                                       # 返回结果
+            'success':           1,
+            'data':              resultdata,
+        })
+    else:
+        return JsonResponse({
+            'success': 0,
+            'data': ''
+        })
