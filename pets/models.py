@@ -219,7 +219,7 @@ class pet(models.Model):
         verbose_name="照片",
         default=0,)
     description = models.CharField(
-        max_length=3000,
+        max_length=5000,
         verbose_name="描述",
         default="发布者很懒，什么都没有说",)
     adoption_speed = models.IntegerField(
