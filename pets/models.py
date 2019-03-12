@@ -157,12 +157,12 @@ class pet(models.Model):
     rescuer_name = models.CharField(
         max_length=50,
         verbose_name="救助者姓名",
-        default=None,
+        default="admin",
         blank=True,)
     publisher_name = models.CharField(
         max_length=50,
         verbose_name="发布者姓名",
-        default=None,)
+        default="admin",)
 
     pet_type = models.IntegerField(
         choices=PET_TYPE_CHOICE,
