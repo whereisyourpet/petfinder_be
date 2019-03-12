@@ -110,22 +110,37 @@ def accounts_modify(request):
             user.nickname = request.POST["nickname"]
 
         if "has_pet" in request.POST:
-            user.has_pet = request.POST["has_pet"]
-
+            # user.has_pet = request.POST["has_pet"]
+            if(request.POST["has_pet"]=="1"):
+                user.has_pet=True
+            else:
+                user.has_pet=False
         if "willing" in request.POST:
-            user.willing = request.POST["willing"]
+            # user.willing = request.POST["willing"]
+            if(request.POST["willing"]=="1"):
+                user.willing=True
+            else:
+                user.willing=False
 
         if "number" in request.POST:
             user.number = request.POST["number"]
 
         if "married" in request.POST:
-            user.married = request.POST["married"]
+            # user.married = request.POST["married"]
+            if(request.POST["married"]=="1"):
+                user.married=True
+            else:
+                user.married=False
 
         if "phone" in request.POST:
             user.phone = request.POST["phone"]
 
         if "gender" in request.POST:
-            user.gender = request.POST["gender"]
+            # user.gender = request.POST["gender"]
+            if(request.POST["gender"]=="1"):
+                user.gender=True
+            else:
+                user.gender=False
 
         if "description" in request.POST:
             user.description = request.POST["description"]
