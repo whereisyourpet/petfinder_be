@@ -368,7 +368,7 @@ def petfilter(request):
         })
 
 def get_pet_info_from_id(requets):
-    if request.user.is_authenticated and request.method == "POST"::
+    if request.user.is_authenticated and request.method == "POST":
         pet_id = request.POST['pet_id']
         pets = pet.objects.filter(pet_id=pet_id).values(
             'pet_id','state','primary_breed','secondary_breed',
