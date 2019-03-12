@@ -60,6 +60,7 @@ class pet(models.Model):
     )
     # choice of pet type
     PET_TYPE_CHOICE = (
+        (0, 'Not Specified'),
         (1, 'Dog'),
         (2, 'Cat'),
     )
@@ -73,6 +74,7 @@ class pet(models.Model):
     )
     # choice of gender
     GENDER_CHOICE = (
+        (0, 'Not Specified'),
         (1, 'Male'),
         (2, 'Female'),
         (3, 'Mixed, if profile represents group of pets'),
@@ -93,24 +95,28 @@ class pet(models.Model):
     )
     # choide of Sterilized
     STERILIZED_CHOICE = (
+        (0, 'Not Specified'),
         (1, 'Yes'),
         (2, 'No'),
         (3, 'Not Sure'),
     )
     # choice of Dewormed
     DEWORMED_CHOICE = (
+        (0, 'Not Specified'),
         (1, 'Yes'),
         (2, 'No'),
         (3, 'Not Sure'),
     )
     # choice of Vaccinated
     VACCINATED_CHOICE = (
+        (0, 'Not Specified'),
         (1, 'Yes'),
         (2, 'No'),
         (3, 'Not Sure'),
     )
     # choice of fur length
     FUR_LENGTH_CHOICE = (
+        (0, 'Not Specified'),
         (1, 'Short'),
         (2, 'Medium'),
         (3, 'Long'),

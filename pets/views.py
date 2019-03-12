@@ -2,7 +2,8 @@
 from django.http import JsonResponse
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate, login, logout
-from .models import pet
+from .models import pet,state
+from .models import state as STATEOBJECT
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.csrf import csrf_exempt
@@ -17,7 +18,7 @@ import json
 import uuid
 
 # Create your views here.
-def get_pet_info(request):
+def get_pets_of_user(request):
     """
     用户登陆后才可调用该请求，返回该用户已发布的宠物id列表
     """
@@ -39,6 +40,11 @@ def get_pet_info(request):
             'success':           0,
         })
 
+def setdefault(tmpstr):
+    if(len(tmpstr)==0):
+        return 0
+    else:
+        return int(tmpstr)
 
 @csrf_exempt
 def publish_pet_information(request):
@@ -56,27 +62,32 @@ def publish_pet_information(request):
         pet_id          = str(uuid.uuid1()).replace("-","")
         publisher_name  = request.user.get_username()
         pet_name        = request.POST['pet_name']
-        pet_type        = request.POST['pet_type']
-        pet_gender      = request.POST['pet_gender']
-        pet_age         = request.POST['pet_age']
-        primary_breed   = request.POST['primary_breed']
-        secondary_breed = request.POST['secondary_breed']
-        primary_color   = request.POST['primary_color']
-        secondary_color1= request.POST['secondary_color1']
-        secondary_color2= request.POST['secondary_color2']
-        maturity_size   = request.POST['maturity_size']
-        fur_length      = request.POST['fur_length']
-        state           = request.POST['state']
-        dewormed        = request.POST['dewormed']
-        sterilized      = request.POST['sterilized']
-        vaccinated      = request.POST['vaccinated']
-        health          = request.POST['health']
-        quantity        = request.POST['quantity']
-        fee             = request.POST['fee']
-        video_amt       = request.POST['video_amt']
-        photo_amt       = request.POST['photo_amt']
+        pet_type        = setdefault(request.POST['pet_type'])
+        pet_gender      = setdefault(request.POST['pet_gender'])
+        pet_age         = setdefault(request.POST['pet_age'])
+        primary_breed   = setdefault(request.POST['primary_breed'])
+        secondary_breed = setdefault(request.POST['secondary_breed'])
+        primary_color   = setdefault(request.POST['primary_color'])
+        secondary_color1= setdefault(request.POST['secondary_color1'])
+        secondary_color2= setdefault(request.POST['secondary_color2'])
+        maturity_size   = setdefault(request.POST['maturity_size'])
+        fur_length      = setdefault(request.POST['fur_length'])
+        receive_state_id= request.POST['state']
+        dewormed        = setdefault(request.POST['dewormed'])
+        sterilized      = setdefault(request.POST['sterilized'])
+        vaccinated      = setdefault(request.POST['vaccinated'])
+        health          = setdefault(request.POST['health'])
+        quantity        = setdefault(request.POST['quantity'])
+        fee             = setdefault(request.POST['fee'])
+        video_amt       = setdefault(request.POST['video_amt'])
+        photo_amt       = setdefault(request.POST['photo_amt'])
         description     = request.POST['description']
-        #length          = request.POST['length']
+
+        # 设置默认值
+        if(len(receive_state_id)==0):
+            state = STATEOBJECT.objects.filter(state_id=int(receive_state_id))
+        else:
+            state = STATEOBJECT.objects.filter(state_id=1)
 
         pet.objects.create(
             rescuer_name    = 'None',
@@ -93,7 +104,7 @@ def publish_pet_information(request):
             secondary_color2= secondary_color2,
             maturity_size   = maturity_size,
             fur_length      = fur_length,
-            state           = state,
+            state           = state[0],
             dewormed        = dewormed,
             sterilized      = sterilized,
             vaccinated      = vaccinated,
@@ -247,6 +258,7 @@ def get_recommand_pets(request):
         # 加权常数项
         # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
         # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1 health*10
+        # dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1,10])
         dataweight = mat(
             [10*w_pet_type,         2*w_pet_age,            2*w_primary_breed,
             2*w_secondary_breed,    10*w_pet_gender,        2*w_primary_color,
@@ -312,19 +324,67 @@ def petfilter(request):
         pet_type        = int(request.POST['pet_type'])
         pet_gender      = int(request.POST['pet_gender'])
         primary_color   = int(request.POST['primary_color'])
-        secondary_color1= int(request.POST['secondary_color1'])
-        secondary_color2= int(request.POST['secondary_color2'])
+        secondary_color1= setdefault(request.POST['secondary_color1'])
+        secondary_color2= setdefault(request.POST['secondary_color2'])
         state           = int(request.POST['state'])
         upfee           = int(request.POST['upfee'])
         downfee         = int(request.POST['downfee'])
-        quantity        = int(request.POST['quantity'])
+        upquantity      = int(request.POST['upquantity'])
+        downquantity    = int(request.POST['downquantity'])
+
+        if(secondary_color1==0 and secondary_color2!=0):
+            pets = pet.objects.filter(
+                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
+                secondary_color1=secondary_color2,
+                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
+                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+        elif(secondary_color1!=0 and secondary_color2==0):
+            pets = pet.objects.filter(
+                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
+                secondary_color1=secondary_color1,
+                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
+                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+        elif(secondary_color1==0 and secondary_color2==0):
+            pets = pet.objects.filter(
+                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
+                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
+                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+        else:
+            pets = pet.objects.filter(
+                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
+                secondary_color1=secondary_color1,secondary_color2=secondary_color2,
+                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
+                quantity__get=downquantity,quantity__lt=upquantity).values('pet_id')
+        data = serializers.serialize("json",pets)
 
         return JsonResponse({                                                       # 返回结果
             'success':           1,
-            'data':              resultdata,
+            'data':              data,
         })
     else:
         return JsonResponse({
             'success': 0,
             'data': ''
+        })
+
+def get_pet_info_from_id(requets):
+    if request.user.is_authenticated and request.method == "POST"::
+        pet_id = request.POST['pet_id']
+        pets = pet.objects.filter(pet_id=pet_id).values(
+            'pet_id','state','primary_breed','secondary_breed',
+            'primary_color','secondary_color1','secondary_color2',
+            'rescuer_name','publisher_name','pet_type','pet_name',
+            'pet_age','maturity_size','gender','fur_length',
+            'vaccinated','dewormed','sterilized','health',
+            'quantity','fee','video_amt','photo_amt','description',
+            'adoption_speed','popularity_star','adoption_star')
+        data = serializers.serialize("json",pets)
+        # return JsonResponse(data, safe=False)
+        return JsonResponse({
+            'success':           1,
+            'data':             data,
+        })
+    else:
+        return JsonResponse({
+            'success':           0,
         })
