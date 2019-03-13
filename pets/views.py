@@ -312,19 +312,17 @@ def petfilter(request):
         pet_type        = setdefault(request.POST['pet_type'])
         pet_gender      = setdefault(request.POST['pet_gender'])
         primary_color   = setdefault(request.POST['primary_color'])
-        secondary_color1= setdefault(request.POST['secondary_color1'])
-        secondary_color2= setdefault(request.POST['secondary_color2'])
         state           = int(request.POST['state'])
+        upquantity      = int(request.POST['quantity'])
 
         # 测试代码
         # pets = pet.objects.filter(
-        #         pet_type=1,gender=1,primary_color=1,
-        #         state__state_id=41336,fee__gte=0,fee__lt=20,
-        #         quantity__gte=0,quantity__lt=20).values('pet_id')
+        #     pet_type=1,gender=2,primary_color=1,
+        #     state__state_id=41336,quantity__lt=20).values('pet_id')
+
         pets = pet.objects.filter(
             pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-            secondary_color1=secondary_color1,secondary_color2=secondary_color2,
-            state__state_id=state).values('pet_id')
+            state__state_id=state,quantity__lt=upquantity).values('pet_id')
         data = serializers.serialize("json",pets)
 
         return JsonResponse({                                                       # 返回结果
