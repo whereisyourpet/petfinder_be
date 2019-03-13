@@ -419,7 +419,6 @@ def get_pet_info_from_idlist(request):
                 'vaccinated','dewormed','sterilized','health',
                 'quantity','fee','video_amt','photo_amt','description',
                 'adoption_speed','popularity_star','adoption_star')))
-            # return JsonResponse(data, safe=False)
         if(len(data)!=0):
             return JsonResponse({
                 'success':           1,
