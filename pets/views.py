@@ -323,7 +323,7 @@ def petfilter(request):
         pets = pet.objects.filter(
             pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
             state__state_id=state,quantity__lt=upquantity).values('pet_id')
-        data = serializers.serialize("json",pets)
+        data = list(pets)
 
         return JsonResponse({                                                       # 返回结果
             'success':           1,
