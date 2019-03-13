@@ -404,3 +404,34 @@ def get_pet_info_from_id(request):
             'success':           0,
             'data':             "wrong method",
         })
+
+@csrf_exempt
+def get_pet_info_from_idlist(request):
+    if request.user.is_authenticated and request.method == "POST":
+        pet_id_list = request.POST['pet_id_list'].replace("[","").replace("]","").replace("\n","").split(",")
+        data = []
+        for id in pet_id_list:
+            data.append(list(pet.objects.filter(pet_id=id).values(
+                'pet_id','state','primary_breed','secondary_breed',
+                'primary_color','secondary_color1','secondary_color2',
+                'rescuer_name','publisher_name','pet_type','pet_name',
+                'pet_age','maturity_size','gender','fur_length',
+                'vaccinated','dewormed','sterilized','health',
+                'quantity','fee','video_amt','photo_amt','description',
+                'adoption_speed','popularity_star','adoption_star')))
+            # return JsonResponse(data, safe=False)
+        if(len(data)!=0):
+            return JsonResponse({
+                'success':           1,
+                'data':             data,
+            })
+        else:
+            return JsonResponse({
+                'success':           0,
+                'data':             "incorrect pet id",
+            })
+    else:
+        return JsonResponse({
+            'success':           0,
+            'data':             "wrong method",
+        })

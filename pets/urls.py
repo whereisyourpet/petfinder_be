@@ -11,4 +11,5 @@ urlpatterns = [
     path('petfilter', views.petfilter, name='petfilter'),
     path('get_recommand_pets', views.get_recommand_pets, name='get_recommand_pets'),
     path('get_pet_info_from_id', views.get_pet_info_from_id, name='get_pet_info_from_id'),
+    path('get_pet_info_from_idlist', views.get_pet_info_from_idlist, name='get_pet_info_from_idlist'),
 ]
