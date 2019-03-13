@@ -55,64 +55,37 @@ def publish_pet_information(request):
     ## 用户只有在登录后才能发布流浪动物的信息
     ###
     if request.user.is_authenticated and request.method == "POST":
-        # 提取json信息
-        # 判断是否空，若空则为，默认值
-        # 由前端判断
-        pet_id          = str(uuid.uuid1()).replace("-","")
-        publisher_name  = request.user.get_username()
-        pet_name        = request.POST['pet_name']
-        pet_type        = setdefault(request.POST['pet_type'])
-        pet_gender      = setdefault(request.POST['pet_gender'])
-        pet_age         = setdefault(request.POST['pet_age'])
-        primary_breed   = setdefault(request.POST['primary_breed'])
-        secondary_breed = setdefault(request.POST['secondary_breed'])
-        primary_color   = setdefault(request.POST['primary_color'])
-        secondary_color1= setdefault(request.POST['secondary_color1'])
-        secondary_color2= setdefault(request.POST['secondary_color2'])
-        maturity_size   = setdefault(request.POST['maturity_size'])
-        fur_length      = setdefault(request.POST['fur_length'])
-        receive_state_id= request.POST['state']
-        dewormed        = setdefault(request.POST['dewormed'])
-        sterilized      = setdefault(request.POST['sterilized'])
-        vaccinated      = setdefault(request.POST['vaccinated'])
-        health          = setdefault(request.POST['health'])
-        quantity        = setdefault(request.POST['quantity'])
-        fee             = setdefault(request.POST['fee'])
-        video_amt       = setdefault(request.POST['video_amt'])
-        photo_amt       = setdefault(request.POST['photo_amt'])
-        description     = request.POST['description']
-
         # 设置默认值
-
+        receive_state_id= request.POST['state']
         if(len(receive_state_id)!=0):
             state = STATEOBJECT.objects.filter(state_id=int(receive_state_id))
         else:
             state = STATEOBJECT.objects.filter(state_id=41336)
         pet.objects.create(
             rescuer_name    = 'None',
-            pet_id          = pet_id,
-            publisher_name  = publisher_name,
-            pet_name        = pet_name,
-            pet_type        = pet_type,
-            gender          = pet_gender,
-            pet_age         = pet_age,
-            primary_breed   = primary_breed,
-            secondary_breed = secondary_breed,
-            primary_color   = primary_color,
-            secondary_color1= secondary_color1,
-            secondary_color2= secondary_color2,
-            maturity_size   = maturity_size,
-            fur_length      = fur_length,
+            pet_id          = str(uuid.uuid1()).replace("-",""),
+            publisher_name  = request.user.get_username(),
+            pet_name        = request.POST['pet_name'],
+            pet_type        = request.POST['pet_type'],
+            gender          = setdefault(request.POST['pet_gender']),
+            pet_age         = setdefault(request.POST['pet_age']),
+            primary_breed   = setdefault(request.POST['primary_breed']),
+            secondary_breed = setdefault(request.POST['secondary_breed']),
+            primary_color   = setdefault(request.POST['primary_color']),
+            secondary_color1= setdefault(request.POST['secondary_color1']),
+            secondary_color2= setdefault(request.POST['secondary_color2']),
+            maturity_size   = setdefault(request.POST['maturity_size']),
+            fur_length      = setdefault(request.POST['fur_length']),
             state           = state[0],
-            dewormed        = dewormed,
-            sterilized      = sterilized,
-            vaccinated      = vaccinated,
-            health          = health,
-            quantity        = quantity,
-            fee             = fee,
-            video_amt       = video_amt,
-            photo_amt       = photo_amt,
-            description     = description,)
+            dewormed        = setdefault(request.POST['dewormed']),
+            sterilized      = setdefault(request.POST['sterilized']),
+            vaccinated      = setdefault(request.POST['vaccinated']),
+            health          = setdefault(request.POST['health']),
+            quantity        = setdefault(request.POST['quantity']),
+            fee             = setdefault(request.POST['fee']),
+            video_amt       = setdefault(request.POST['video_amt']),
+            photo_amt       = setdefault(request.POST['photo_amt']),
+            description     = request.POST['description'],)
         return JsonResponse({
             'success': 1,
             'msg': '发布成功'
@@ -221,58 +194,11 @@ def get_recommand_pets(request):
     动物id      动物名称    易收养指数  受欢迎程度
     """
     if request.user.is_authenticated and request.method == "POST":
-        publisher_name  = request.user.get_username()
-        pet_type,w_pet_type       = str_to_int(request.POST['pet_type'])
-        pet_gender,w_pet_gender      = str_to_int(request.POST['pet_gender'])
-        pet_age,w_pet_age         = str_to_int(request.POST['pet_age'])
-        primary_breed,w_primary_breed   = str_to_int(request.POST['primary_breed'])
-        secondary_breed,w_secondary_breed = str_to_int(request.POST['secondary_breed'])
-        primary_color,w_primary_color   = str_to_int(request.POST['primary_color'])
-        secondary_color1,w_secondary_color1= str_to_int(request.POST['secondary_color1'])
-        secondary_color2,w_secondary_color2= str_to_int(request.POST['secondary_color2'])
-        maturity_size,w_maturity_size   = str_to_int(request.POST['maturity_size'])
-        fur_length,w_fur_length      = str_to_int(request.POST['fur_length'])
-        state,w_state           = str_to_int(request.POST['state'])
-        dewormed,w_dewormed        = str_to_int(request.POST['dewormed'])
-        sterilized,w_sterilized      = str_to_int(request.POST['sterilized'])
-        vaccinated,w_vaccinated     = str_to_int(request.POST['vaccinated'])
-        fee,w_fee             = str_to_int(request.POST['fee'])
-        health,w_health          = str_to_int(request.POST['health'])
-        k,w_k               = str_to_int(request.POST['k'])
-
-        oralData = array(pet.objects.values_list(                                   # 获取数据库数据
-            'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
-            'primary_color','secondary_color1','secondary_color2','maturity_size',
-            'fur_length','vaccinated','dewormed','sterilized','fee','state','health'))
-        labels = oralData[:,0]                                                      # 获取宠物id作为labels
-        dataset= oralData[:,1:]                                                     # 其余项作为数据集
-        userinput = [                                                               # 获取用户数据数据
-            pet_type,pet_age,primary_breed,secondary_breed,pet_gender,
-            primary_color,secondary_color1,secondary_color2,maturity_size,
-            fur_length,vaccinated,dewormed,sterilized,fee,state,health]
-        #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326,3]
-
-        if(w_k==0):
-            k = 5                                                                   # 设定需要推荐的宠物数量
-        # 加权常数项
-        # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
-        # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1 health*10
-        # dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1,10])
-        dataweight = mat(
-            [10*w_pet_type,         2*w_pet_age,            2*w_primary_breed,
-            2*w_secondary_breed,    10*w_pet_gender,        2*w_primary_color,
-            2*w_secondary_color1,   2*w_secondary_color2,   2*w_maturity_size,
-            2*w_fur_length,         10*w_vaccinated,        10*w_dewormed,
-            10*w_sterilized,        2*w_fee,                1*w_state,          10*w_health])
-        if k>dataset.shape[0]:                                                      # 获取推荐的宠物的id
-            pets_ID_list = list(labels)                                             
-        else:
-            pets_ID_list = recommand(userinput,dataset,labels,k,dataweight)
-
+        pets_ID_list=get_recommand_pets_list(request)                               # 获取推荐结果
         resultdata=[]                                                               # 通过id获取需要返回的宠物id，宠物名字，易收养程度，受欢迎程度
         for i in pets_ID_list:
             resultdata.append(list(pet.objects.filter(pet_id=i).values(
-                    'pet_id','pet_name','adoption_star','popularity_star')))
+                'pet_id','pet_name','adoption_star','popularity_star')))
         return JsonResponse({                                                       # 返回结果
             'success':           1,
             'data':              resultdata,
@@ -282,6 +208,58 @@ def get_recommand_pets(request):
             'success': 0,
             'data': ''
         })
+
+def get_recommand_pets_list(request):
+    pet_type,w_pet_type                 = str_to_int(request.POST['pet_type'])
+    pet_gender,w_pet_gender             = str_to_int(request.POST['pet_gender'])
+    pet_age,w_pet_age                   = str_to_int(request.POST['pet_age'])
+    primary_breed,w_primary_breed       = str_to_int(request.POST['primary_breed'])
+    secondary_breed,w_secondary_breed   = str_to_int(request.POST['secondary_breed'])
+    primary_color,w_primary_color       = str_to_int(request.POST['primary_color'])
+    secondary_color1,w_secondary_color1 = str_to_int(request.POST['secondary_color1'])
+    secondary_color2,w_secondary_color2 = str_to_int(request.POST['secondary_color2'])
+    maturity_size,w_maturity_size       = str_to_int(request.POST['maturity_size'])
+    fur_length,w_fur_length             = str_to_int(request.POST['fur_length'])
+    state,w_state                       = str_to_int(request.POST['state'])
+    dewormed,w_dewormed                 = str_to_int(request.POST['dewormed'])
+    sterilized,w_sterilized             = str_to_int(request.POST['sterilized'])
+    vaccinated,w_vaccinated             = str_to_int(request.POST['vaccinated'])
+    fee,w_fee                           = str_to_int(request.POST['fee'])
+    health,w_health                     = str_to_int(request.POST['health'])
+    k,w_k                               = str_to_int(request.POST['k'])
+
+    userinput = [                                                               # 获取用户数据数据
+        pet_type,pet_age,primary_breed,secondary_breed,pet_gender,
+        primary_color,secondary_color1,secondary_color2,maturity_size,
+        fur_length,vaccinated,dewormed,sterilized,fee,state,health]
+    #userinput = [2,4,300,0,2,2,1,0,1,1,3,1,1,20,41326,3]
+
+    if(w_k==0):
+        k = 5                                                                   # 设定需要推荐的宠物数量
+    # 加权常数项
+    # Type*10	Age*2	Breed1,2*2	Gender*10	Color1,2,3*2	MaturitySize*2	
+    # FurLength*2	Vaccinated*10	Dewormed*10	Sterilized*10   Fee*2	State*1 health*10
+    # dataweight = mat([10,2,2,2,10,2,2,2,2,2,10,10,10,2,1,10])
+    dataweight = mat(
+        [10*w_pet_type,         2*w_pet_age,            2*w_primary_breed,
+        2*w_secondary_breed,    10*w_pet_gender,        2*w_primary_color,
+        2*w_secondary_color1,   2*w_secondary_color2,   2*w_maturity_size,
+        2*w_fur_length,         10*w_vaccinated,        10*w_dewormed,
+        10*w_sterilized,        2*w_fee,                1*w_state,          10*w_health])
+
+    oralData = array(pet.objects.values_list(                                   # 获取数据库数据
+        'pet_id','pet_type','pet_age','primary_breed','secondary_breed','gender',
+        'primary_color','secondary_color1','secondary_color2','maturity_size',
+        'fur_length','vaccinated','dewormed','sterilized','fee','state','health'))
+    labels = oralData[:,0]                                                      # 获取宠物id作为labels
+    dataset= oralData[:,1:]                                                     # 其余项作为数据集
+    
+    if k>dataset.shape[0]:                                                      # 获取推荐的宠物的id
+        pets_ID_list = list(labels)                                             
+    else:
+        pets_ID_list = recommand(userinput,dataset,labels,k,dataweight)
+    
+    return pets_ID_list
 
 def str_to_int(tmpstr):
     if(len(tmpstr)==0):
@@ -331,41 +309,21 @@ def matrix_str_to_int(tmpmatrix):
 @csrf_exempt
 def petfilter(request):
     if request.user.is_authenticated and request.method == "POST":
-        pet_type        = int(request.POST['pet_type'])
-        pet_gender      = int(request.POST['pet_gender'])
-        primary_color   = int(request.POST['primary_color'])
-        secondary_color1= setdefault(request.POST['secondary_color1'])
-        secondary_color2= setdefault(request.POST['secondary_color2'])
+        pet_type        = setdefault(request.POST['pet_type'])
+        pet_gender      = setdefault(request.POST['pet_gender'])
+        primary_color   = setdefault(request.POST['primary_color'])
         state           = int(request.POST['state'])
-        upfee           = int(request.POST['upfee'])
-        downfee         = int(request.POST['downfee'])
-        upquantity      = int(request.POST['upquantity'])
-        downquantity    = int(request.POST['downquantity'])
+        upquantity      = int(request.POST['quantity'])
 
-        if(secondary_color1==0 and secondary_color2!=0):
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                secondary_color1=secondary_color2,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        elif(secondary_color1!=0 and secondary_color2==0):
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                secondary_color1=secondary_color1,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        elif(secondary_color1==0 and secondary_color2==0):
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        else:
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                secondary_color1=secondary_color1,secondary_color2=secondary_color2,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        data = serializers.serialize("json",pets)
+        # 测试代码
+        # pets = pet.objects.filter(
+        #     pet_type=1,gender=2,primary_color=1,
+        #     state__state_id=41336,quantity__lt=20).values('pet_id')
+
+        pets = pet.objects.filter(
+            pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
+            state__state_id=state,quantity__lt=upquantity).values('pet_id')
+        data = list(pets)
 
         return JsonResponse({                                                       # 返回结果
             'success':           1,
@@ -433,4 +391,34 @@ def get_pet_info_from_idlist(request):
         return JsonResponse({
             'success':           0,
             'data':             "wrong method",
+        })
+
+@csrf_exempt
+def starpredictor(request):
+    """
+    Publish new stray animails
+    用户在助宠寻主上发布新流浪动物信息，调用该接口新建动物信息词条
+    """
+    ###
+    ## 用户只有在登录后才能发布流浪动物的信息
+    ###
+    if request.user.is_authenticated and request.method == "POST":
+        pets_ID_list=get_recommand_pets_list(request)                               # 获取推荐结果
+        k = len(pets_ID_list)                                                           
+        tmp_adoption_star = 0
+        tmp_popularity_star = 0
+        for i in pets_ID_list:                                                      # 通过id获取需要返回的易收养程度，受欢迎程度
+            tmp_pet = pet.objects.filter(pet_id=i)
+            tmp_adoption_star += int(tmp_pet.values('adoption_star').first()['adoption_star'])
+            tmp_popularity_star += int(tmp_pet.values('popularity_star').first()['popularity_star'])
+        predict_adoption_star = tmp_adoption_star/k                                 # 预测受欢迎程度和易收养指数
+        predict_popularity_star = tmp_popularity_star/k
+        return JsonResponse({                                                       # 返回结果
+            'success':                            1,
+            'predict_adoption_star':              predict_adoption_star,
+            'predict_popularity_star':            predict_popularity_star,
+        })
+    else:
+        return JsonResponse({
+            'success': 0,
         })
