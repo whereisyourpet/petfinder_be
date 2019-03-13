@@ -309,40 +309,22 @@ def matrix_str_to_int(tmpmatrix):
 @csrf_exempt
 def petfilter(request):
     if request.user.is_authenticated and request.method == "POST":
-        pet_type        = int(request.POST['pet_type'])
-        pet_gender      = int(request.POST['pet_gender'])
-        primary_color   = int(request.POST['primary_color'])
+        pet_type        = setdefault(request.POST['pet_type'])
+        pet_gender      = setdefault(request.POST['pet_gender'])
+        primary_color   = setdefault(request.POST['primary_color'])
         secondary_color1= setdefault(request.POST['secondary_color1'])
         secondary_color2= setdefault(request.POST['secondary_color2'])
         state           = int(request.POST['state'])
-        upfee           = int(request.POST['upfee'])
-        downfee         = int(request.POST['downfee'])
-        upquantity      = int(request.POST['upquantity'])
-        downquantity    = int(request.POST['downquantity'])
 
-        if(secondary_color1==0 and secondary_color2!=0):
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                secondary_color1=secondary_color2,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        elif(secondary_color1!=0 and secondary_color2==0):
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                secondary_color1=secondary_color1,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        elif(secondary_color1==0 and secondary_color2==0):
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
-        else:
-            pets = pet.objects.filter(
-                pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
-                secondary_color1=secondary_color1,secondary_color2=secondary_color2,
-                state__state_id=state,fee__gte=downfee,fee__lt=upfee,
-                quantity__gte=downquantity,quantity__lt=upquantity).values('pet_id')
+        # 测试代码
+        # pets = pet.objects.filter(
+        #         pet_type=1,gender=1,primary_color=1,
+        #         state__state_id=41336,fee__gte=0,fee__lt=20,
+        #         quantity__gte=0,quantity__lt=20).values('pet_id')
+        pets = pet.objects.filter(
+            pet_type=pet_type,gender=pet_gender,primary_color=primary_color,
+            secondary_color1=secondary_color1,secondary_color2=secondary_color2,
+            state__state_id=state).values('pet_id')
         data = serializers.serialize("json",pets)
 
         return JsonResponse({                                                       # 返回结果

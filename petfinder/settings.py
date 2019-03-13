@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'n4rtg&o=6(au*t(@^p8x&vc*^_ytkv&u252#xt#o4z=9gj^-=w'
 
 # Set mode
-MODE = "TEST"
+MODE = "PRODUCT"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
